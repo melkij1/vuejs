@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+  <style>
+    body{
+      background: #eeeeee;
+    }
+    .container{
+      margin: 0 auto;
+      width: 450px;
+      background: #ffffff;
+    }
+    .header {
+      padding: 10px 0px 20px 0px;
+    }
+    .header img{
+      width: 90%;
+      display: block;
+      margin: 0 auto;
+    }
+    .playlist-item{
+        border-bottom: 1px solid #eee;
+        display: flex;
+    }
+    .playlist-item_img{
+      width: 33%;  
+    }
+    .playlist-item_img img{
+      max-width: 100%;
+      margin-top: 20px;
+    }
+    .playlist-item_content{
+      width: 67%;
+      padding-left: 10px;  
+    }
+    .playlist-item_content h6{
+      font-size: 15px;
+      margin: 17px 0px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div id="app">
+    <div class="header">
+      <img src="logo.svg" alt="">
+    </div>
+    <div class="big-video">
+        <iframe width="100%" height="315" :src="currentVideoUrl" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+    <div v-if="info" class="playlist">
+      <div v-for="item in info.data.items"  class="playlist-item">
+        <div @click="changeCurrentVideo(item.snippet.resourceId.videoId)" class="playlist-item_img">
+          <img :src="item.snippet.thumbnails.medium.url" alt="">
+        </div>
+        <div class="playlist-item_content">
+          <h6>{{ item.snippet.title }}</h6>
+          <p>{{ item.snippet.description.substring(0, 200) }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      url: 'https://www.googleapis.com/youtube/v3/playlistItems',
+      option: {
+        part:'snippet',
+        key: 'AIzaSyAl2F--oBCytcaNvq3Qs2X0dJyE3j05IhY',
+        maxResults: 20,
+        playlistId: 'PL2fnLUTsNyq7LM6n3dKtOt3ijyEUBzVUF'
+      },
+      info: [],
+      currentVideoUrl: ''
+
+    },
+    filters: {
+      info (value) {
+        return value.toFixed(2)
+      }
+    },
+    mounted() {
+      axios
+        .get(this.url, {params : this.option})
+        .then(response => {
+          this.info = response;
+          this.currentVideoUrl = "https://www.youtube.com/embed/" + response.data.items[0].snippet.resourceId.videoId;
+        });
+    },
+    methods: {
+      changeCurrentVideo(id){
+        this.currentVideoUrl = "https://www.youtube.com/embed/" + id;
+        console.log('balal')
+      }
+    }
+  })
+</script>
+
+</body>
+</html>
